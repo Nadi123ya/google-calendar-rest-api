@@ -1,0 +1,273 @@
+.page {
+  max-width: 1440px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.button {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #808080;
+  outline: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.icon-button {
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.modal {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1440px;
+  height: 100vh;
+  background-color: #cccccc45;
+  z-index: 10;
+}
+.modal__content {
+  background: #ffff;
+  padding: 16px;
+  border: 1px solid #808080;
+  border-radius: 8px;
+}
+
+.overlays {
+  position: absolute;
+  z-index: 1;
+}
+
+.popup__content {
+  background-color: #ffff;
+  padding: 16px;
+  border: 1px solid #808080;
+  border-radius: 8px;
+}
+
+.hidden {
+  display: none;
+}
+
+.header {
+  display: flex;
+  position: fixed;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 18px 0 16px 27px;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  border-bottom: 1px solid #808080;
+  background-color: #ffff;
+}
+
+.navigation__today-btn {
+  flex-shrink: 0;
+  height: 40px;
+  width: 85px;
+  margin-right: 31px;
+  border-radius: 3px;
+  letter-spacing: 0.25px;
+  box-shadow: 0px 1px 2px 0px #3c40434d, 0px 1px 3px 1px #3c404326;
+  background-color: #ffff;
+}
+
+.create-event-btn {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  width: 114px;
+  border-radius: 20px;
+  margin-right: 26px;
+  font-size: 16px;
+  letter-spacing: 0.25px;
+  transition: border 280ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0px 1px 2px 0px #3c40434d, 0px 1px 3px 1px #3c404326;
+  background-color: #ffff;
+}
+
+.calendar {
+  margin: 0 auto;
+  max-width: 1440px;
+  width: 100%;
+}
+.calendar__line {
+  border-bottom: 1px solid #808080;
+  width: 100%;
+  opacity: 0.1;
+}
+.calendar__header {
+  display: flex;
+  position: sticky;
+  top: 60px;
+  padding-left: 60px;
+  padding-top: 20px;
+  justify-content: space-around;
+  background-color: #ffff;
+  z-index: 1;
+}
+.calendar__body {
+  position: relative;
+  top: 62px;
+  padding-bottom: 40px;
+}
+.calendar__day-label {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+.calendar__week-container {
+  display: flex;
+}
+.calendar__week {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+.calendar__day {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  border: 1px solid #808080;
+}
+.calendar__time-slot {
+  flex-grow: 1;
+  height: 60px;
+  border-bottom: 2px solid #808080;
+}
+
+.day-label {
+  text-align: center;
+  font-size: 24px;
+  color: #817f7f;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.day-label__day-name {
+  font-size: 14px;
+}
+.day-label__day-name_active {
+  color: #1a73e8;
+}
+.day-label__day-number {
+  text-align: center;
+  color: #11223f;
+  font-size: 36px;
+}
+.day-label__day-number_active {
+  background-color: #1a73e8;
+  border-radius: 50%;
+  color: #ffff;
+}
+
+.calendar__time-scale {
+  display: flex;
+  flex-direction: column;
+  padding-left: 17px;
+  margin-top: -7px;
+}
+
+.time-slot {
+  display: flex;
+  flex-grow: 1;
+  height: 60px;
+  margin: 0;
+}
+.time-slot__time {
+  margin: 0;
+  text-align: right;
+  color: #6b6363;
+}
+
+.create-event {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.create-event__close-btn {
+  opacity: 0.5;
+  cursor: pointer;
+}
+.create-event__close-btn:hover {
+  opacity: 1;
+  background-color: #ff0000;
+}
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-form__time {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-form__field {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 2px solid #808080;
+}
+
+.event-time {
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+.event-form__submit-btn {
+  background-color: #ffff;
+  border: none;
+  opacity: 0.5;
+  cursor: pointer;
+}
+.event-form__submit-btn:hover {
+  opacity: 1;
+}
+
+.event-form__submit-btn-update {
+  margin-top: 10px;
+  margin-left: 71px;
+  display: flex;
+}
+.event-form__submit-btn-update:hover {
+  opacity: 1;
+}
+
+.event {
+  background-color: #6c97e6;
+  color: #ffffff;
+  text-align: center;
+}
+.event__title {
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.event__time {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+.event__description {
+  font-size: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 18px;
+  font-family: "Roboto", sans-serif;
+}
+
+/*# sourceMappingURL=index.css.map */
