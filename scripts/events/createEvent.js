@@ -2,11 +2,13 @@
 import { renderEvents } from './events.js'
 import { getDateTime } from '../common/time.utils.js'
 import { closeModal } from '../common/modal.js'
+import { createEvent, getEvents } from '../common/eventsGateway.js'
 
 const closeEventFormBtn = document.querySelector('.create-event__close-btn')
 const eventFormElem = document.querySelector('.event-form')
 
 export const events = []
+
 console.log(events)
 
 function clearEventForm() {
@@ -68,10 +70,17 @@ function onCreateEvent(event) {
         return
     }
 
-    events.push(newEvent)
-    console.log(events)
-    onCloseEventForm()
-    renderEvents()
+    createEvent(newEvent)
+        .then(() => getEvents())
+        .then(() => {
+            onCloseEventForm()
+            renderEvents()
+        })
+
+    // events.push(newEvent)
+    // console.log(events)
+    // onCloseEventForm()
+    // renderEvents()
 }
 
 export function initEventForm() {

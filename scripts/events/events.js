@@ -7,6 +7,7 @@ import { closeUpdateModal } from '../common/modal.js'
 import { getDateTime } from '../common/time.utils.js'
 import { events } from '../events/createEvent.js'
 import { renderWeek } from '../calendar/calendar.js'
+import { getEvents, deleteEvent, updateEvent } from '../common/eventsGateway.js'
 
 const weekElem = document.querySelector('.calendar__week')
 const deleteEventBtn = document.querySelector('.delete__event-btn')
@@ -24,6 +25,7 @@ const formater = new Intl.DateTimeFormat('en-GB', {
     minute: '2-digit',
     hour12: false,
 })
+
 const getTime = (date) => formater.format(date)
 
 function getDateEvent(selectedDate) {
@@ -81,31 +83,63 @@ const createEventElement = (event) => {
 
 export const renderEvents = () => {
     // не забудьте удалить с календаря старые события перед добавлением новых
-
     removeEventsFromCalendar()
-    // достаем из storage все события и дату понедельника отображаемой недели
-    // const events = getItem('events') || []
-    const startDateTime = getDisplayedWeekStart()
-    const endDateTime = shmoment(startDateTime).add('days', 7).result()
-    // фильтруем события, оставляем только те, что входят в текущую неделю
-    events
-        .filter((event) => {
-            if (
-                new Date(event.start).getTime() >= startDateTime.getTime() &&
-                new Date(event.end).getTime() < endDateTime.getTime() === true
+    getEvents().then((events) => {
+        const startDateTime = getDisplayedWeekStart()
+        const endDateTime = shmoment(startDateTime).add('days', 7).result()
+        // фильтруем события, оставляем только те, что входят в текущую неделю
+        events
+            .filter((event) => {
+                if (
+                    new Date(event.start).getTime() >=
+                        startDateTime.getTime() &&
+                    new Date(event.end).getTime() < endDateTime.getTime() ===
+                        true
+                )
+                    return event
+            })
+            .forEach((event) => {
+                const { start } = event
+                const startEl = new Date(start)
+                const eventElem = createEventElement(event)
+                const slotElem = document.querySelector(
+                    `.calendar__day[data-day="${startEl.getDate()}"] .calendar__time-slot[data-time="${startEl.getHours()}"]`
+                )
+                slotElem.append(eventElem)
+            })
+    })
+}
+
+function onDeleteEvent(eventId) {
+    console.log(eventId)
+    getEvents().then((events) => {
+        const eventToCheck = events.find((el) => el.id === eventId)
+        console.log(eventToCheck)
+        console.log(eventToCheck.id)
+
+        const startTimeCheck = new Date(eventToCheck.start).getTime()
+        const currentTime = new Date().getTime()
+        const fifteenMin = 1000 * 60 * 15
+
+        if (
+            startTimeCheck > currentTime &&
+            startTimeCheck - currentTime <= fifteenMin
+        ) {
+            alert(
+                'You cannot delete the event that is starting in less then 15 min!'
             )
-                return event
-        })
-        .forEach((event) => {
-            const { start } = event
-            const startEl = new Date(start)
-            const eventElem = createEventElement(event)
-            const slotElem = document.querySelector(
-                `.calendar__day[data-day="${startEl.getDate()}"] .calendar__time-slot[data-time="${startEl.getHours()}"]`
-            )
-            slotElem.append(eventElem)
+            return
+        }
+    })
+
+    deleteEvent(eventId)
+        .then(() => getEvents())
+        .then(() => {
+            closePopup()
+            renderWeek()
         })
 }
+
 function handleEventClick(event) {
     const isEvent = event.target.closest('.event')
     if (!isEvent) {
@@ -137,56 +171,18 @@ function handleEventClick(event) {
         openModal()
         return
     }
-
-    openPopup(event.pageX, event.pageY)
-
-    const eventId = isEvent.getAttribute('data-event-id')
-    // setItem('eventIdToDelete', `${eventId}`)
-    const [filteredEvent] = events.filter(({ id }) => id === Number(eventId))
-    popupDescriptionElem.innerHTML = `
-    <p class="popup__title">${filteredEvent.title}</p>
-    <p class="popup__event">${getTime(filteredEvent.start)} - ${getTime(
-        filteredEvent.end
-    )}</p>
-    <p class="popup__text">${filteredEvent.description}</p>`
-}
-
-function onDeleteEvent(eventId) {
-    const [eventToCheck] = events.filter((el) => {
-        if ((el.id === eventId) === true);
-        return el
+    getEvents().then((events) => {
+        openPopup(event.pageX, event.pageY)
+        const eventId = isEvent.getAttribute('data-event-id')
+        const filteredEvent = events.find((el) => el.id === eventId)
+        popupDescriptionElem.innerHTML = `
+        <p class="popup__title">${filteredEvent.title}</p>
+        <p class="popup__event">${getTime(
+            new Date(filteredEvent.start)
+        )} - ${getTime(new Date(filteredEvent.end))}</p>
+        <p class="popup__text">${filteredEvent.description}</p>`
+        // onDeleteEvent(eventId)
     })
-
-    console.log([eventToCheck])
-    console.log(eventToCheck.id)
-    const startTimeCheck = new Date(eventToCheck.start).getTime()
-    const currentTime = new Date().getTime()
-    const fifteenMin = 1000 * 60 * 15
-
-    if (
-        startTimeCheck > currentTime &&
-        startTimeCheck - currentTime <= fifteenMin
-    ) {
-        alert(
-            'You cannot delete the event that is starting in less then 15 min!'
-        )
-        return
-    }
-    const evIndex = events.findIndex((el) => {
-        if (el.id === eventToCheck.id) {
-            console.log(el)
-            return el
-        }
-    })
-
-    console.log(evIndex)
-
-    const deletedEvent = events.splice(evIndex, 1)
-    console.log(deletedEvent)
-    console.log(events)
-
-    closePopup()
-    renderWeek(events)
 }
 
 function clearEventUpdateForm() {
@@ -202,41 +198,48 @@ function onCloseEventUpdateForm() {
 
 const addUpdatedEvent = (event, eventId) => {
     event.preventDefault()
-    // const events = getItem('events') || []
-    // const eventIdToDelete = Number(getItem('eventIdToDelete'))
-    // const eventIdToDelete = { eventId };
-    console.log(events)
-    const [filteredEvent] = events.filter(({ id }) => id !== String(eventId))
-    console.log([filteredEvent])
-    // const findEvent = events.find((event) => event.id === eventId)
-    const formData = Object.fromEntries(new FormData(eventFormElemUpdate))
-    const changedEvent = {
-        title: formData.title || '(No title)',
-        description: formData.description,
-        start: getDateTime(formData.date, formData.startTime),
-        end: getDateTime(formData.date, formData.endTime),
-        id: filteredEvent.id,
-    }
-    console.log(changedEvent)
-    const previousEvent = events.find((el) => el.id === changedEvent.id)
-    console.log(previousEvent)
-    const updatedObj = {
-        ...previousEvent,
-        ...changedEvent,
-    }
-    console.log(updatedObj)
-    const eventIndex = events.findIndex((el) => el.id === changedEvent.id)
-    console.log(eventIndex)
-    const updatedEvents = events.splice(eventIndex, 1, updatedObj)
+    getEvents().then((events) => {
+        const [filteredEvent] = events.filter(
+            ({ id }) => id !== String(eventId)
+        )
+        console.log([filteredEvent])
+        // const findEvent = events.find((event) => event.id === eventId)
+        const formData = Object.fromEntries(new FormData(eventFormElemUpdate))
+        const changedEvent = {
+            title: formData.title || '(No title)',
+            description: formData.description,
+            start: getDateTime(formData.date, formData.startTime),
+            end: getDateTime(formData.date, formData.endTime),
+            id: filteredEvent.id,
+        }
+        console.log(changedEvent)
+        const previousEvent = events.find((el) => el.id === changedEvent.id)
+        console.log(previousEvent)
+        const updatedObj = {
+            ...previousEvent,
+            ...changedEvent,
+        }
 
-    console.log(updatedEvents)
-
-    onCloseEventUpdateForm()
-    // renderWeek(events)
-    renderEvents()
+        updateEvent(eventId, updatedObj)
+            .then(() => getEvents())
+            .then(() => {
+                onCloseEventUpdateForm()
+                renderEvents()
+            })
+    })
 }
+// console.log(updatedObj)
+// const eventIndex = events.findIndex((el) => el.id === changedEvent.id)
+// console.log(eventIndex)
+// const updatedEvents = events.splice(eventIndex, 1, updatedObj)
 
-const updateEvent = (event, eventId) => {
+// console.log(updatedEvents)
+
+// onCloseEventUpdateForm()
+// // renderWeek(events)
+// renderEvents()
+
+const updatedEvent = (event, eventId) => {
     openUpdateModal(event.pageX, event.pageY)
     closePopup()
 
@@ -264,6 +267,6 @@ closeEventBtnUpdate.addEventListener('click', closeUpdateModal)
 
 deleteEventBtn.addEventListener('click', onDeleteEvent)
 
-updateEventBtn.addEventListener('click', updateEvent)
+updateEventBtn.addEventListener('click', updatedEvent)
 
 submitButtonUpdate.addEventListener('click', addUpdatedEvent)
