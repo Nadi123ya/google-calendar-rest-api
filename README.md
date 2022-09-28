@@ -14,6 +14,7 @@
 - [BEM methodology](https://en.bem.info/methodology/)
 - [Materialize](https://materializecss.com/)
 - [ESlint](https://eslint.org/)
-
+- [Momentjs](https://momentjs.com/)
+ 
 ## Author
 ### Nadiia Bondarenko

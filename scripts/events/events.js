@@ -47,7 +47,6 @@ function removeEventsFromCalendar() {
     return document
         .querySelectorAll('.event')
         .forEach((event) => event.remove())
-    // ф-ция для удаления всех событий с календаря
 }
 
 const createEventElement = (event) => {
@@ -81,12 +80,10 @@ const createEventElement = (event) => {
 }
 
 export const renderEvents = () => {
-    // не забудьте удалить с календаря старые события перед добавлением новых
     removeEventsFromCalendar()
     getEvents().then((events) => {
         const startDateTime = getDisplayedWeekStart()
         const endDateTime = shmoment(startDateTime).add('days', 7).result()
-        // фильтруем события, оставляем только те, что входят в текущую неделю
         events
             .filter((event) => {
                 if (
@@ -200,8 +197,6 @@ function clearEventUpdateForm() {
 function onCloseEventUpdateForm() {
     clearEventUpdateForm()
     closeUpdateModal()
-    // здесь нужно закрыть модальное окно ++;
-    // и очистить форму ++
 }
 
 const addUpdatedEvent = (event) => {
